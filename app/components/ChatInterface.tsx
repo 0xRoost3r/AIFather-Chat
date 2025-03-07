@@ -49,6 +49,7 @@ export default function ChatInterface() {
   const [input, setInput] = useState('');
   const [showIntro, setShowIntro] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   const { brandInfo, subdomain } = useBrand();
 
@@ -63,6 +64,7 @@ export default function ChatInterface() {
   const handleSend = async () => {
     if (input.trim()) {
       setShowIntro(false);
+      setError(null); // Reset error state
       
       // Thêm tin nhắn của người dùng vào danh sách
       const userMessage = input;
@@ -73,8 +75,10 @@ export default function ChatInterface() {
       setIsLoading(true);
       
       try {
-        // Gọi API chat
-        const response = await fetch('/api/chat', {
+        console.log(`Sending message to API from subdomain: ${subdomain}`);
+        
+        // Gọi API chat - sử dụng URL với subdomain
+        const response = await fetch(`/api/${subdomain}/chat`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -85,17 +89,21 @@ export default function ChatInterface() {
         });
         
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          const errorData = await response.json().catch(() => ({}));
+          console.error('API error:', response.status, errorData);
+          throw new Error(`Server responded with status: ${response.status}`);
         }
         
         const data = await response.json();
+        console.log('API response:', data);
         
         // Thêm phản hồi từ bot vào danh sách tin nhắn
         setMessages(prev => [...prev, { text: data.response, isBot: true }]);
       } catch (error) {
         console.error('Error sending message:', error);
+        setError(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
         setMessages(prev => [...prev, { 
-          text: "Sorry, there was an error processing your request.", 
+          text: "Sorry, there was an error processing your request. Please try again later.", 
           isBot: true 
         }]);
       } finally {
@@ -261,6 +269,13 @@ export default function ChatInterface() {
           </div>
         </motion.div>
       </div>
+
+      {/* Hiển thị thông báo lỗi nếu có */}
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/50 rounded-md p-3 text-red-700 text-sm mb-4">
+          {error}
+        </div>
+      )}
     </div>
   );
 } 

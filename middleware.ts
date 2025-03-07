@@ -30,7 +30,6 @@ export default async function middleware(req: NextRequest) {
     }
   } else if (hostname.includes(mainDomain)) {
     // Xử lý cho môi trường production
-    // Ví dụ: gen8.lapnghiepvoi1trieudong.com -> ['gen8', 'lapnghiepvoi1trieudong', 'com']
     if (domainParts.length > 2) {
       isSubdomain = true;
       subdomain = domainParts[0];
@@ -42,6 +41,20 @@ export default async function middleware(req: NextRequest) {
   // Thêm thông tin subdomain vào header
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-subdomain', subdomain);
+  
+  // Xử lý API routes
+  if (path.startsWith('/api')) {
+    // Nếu là API route và không có [domain] trong path
+    if (path === '/api/chat') {
+      // Rewrite đến API route với subdomain
+      url.pathname = `/api/${subdomain}/chat`;
+      console.log(`Rewriting API to: ${url.pathname}`);
+      return NextResponse.rewrite(url);
+    }
+  } else {
+    // Xử lý các routes khác (không phải API)
+    // Không thay đổi URL path, chỉ truyền subdomain qua header
+  }
   
   // Trả về response với header chứa thông tin subdomain
   return NextResponse.next({

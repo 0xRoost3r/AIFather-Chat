@@ -11,27 +11,16 @@ export async function OPTIONS() {
   });
 }
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { domain: string } }
-) {
+export async function POST(request: NextRequest) {
   try {
-    // Log toàn bộ request để debug
-    console.log('API route params:', params);
-    console.log('API route headers:', Object.fromEntries(request.headers.entries()));
-    
-    // Lấy subdomain từ params
-    const subdomain = params.domain;
-    
-    console.log(`API route handling request for subdomain: ${subdomain}`);
+    // Lấy subdomain từ header
+    const subdomain = request.headers.get('x-subdomain') || 'gen8';
     
     // Lấy dữ liệu từ request body
     const body = await request.json();
-    console.log('Request body:', body);
-    
     const { message } = body;
     
-    console.log(`Message received: "${message}"`);
+    console.log(`API received message from subdomain ${subdomain}: ${message}`);
     
     // Xử lý phản hồi dựa trên subdomain
     let response: string;
@@ -53,11 +42,7 @@ export async function POST(
       success: true 
     });
   } catch (error) {
-    console.error('Detailed error in chat API:', error);
-    // Log stack trace nếu có
-    if (error instanceof Error) {
-      console.error('Error stack:', error.stack);
-    }
+    console.error('Error in chat API:', error);
     return NextResponse.json(
       { error: 'Internal Server Error', success: false },
       { status: 500 }
