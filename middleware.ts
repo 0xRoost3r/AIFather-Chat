@@ -12,38 +12,41 @@ export default async function middleware(req: NextRequest) {
   const hostname = req.headers.get('host') || '';
   const path = url.pathname;
   
-  // Xử lý cho localhost development
+  // Xác định domain chính
+  const mainDomain = 'lapnghiepvoi1trieudong.com';
+  
+  // Lấy các phần của domain
+  const domainParts = hostname.split('.');
+  
+  // Xác định xem có phải là subdomain không
+  let isSubdomain = false;
+  let subdomain = 'gen8'; // Subdomain mặc định
+  
   if (hostname.includes('localhost')) {
-    // Lấy subdomain từ hostname (ví dụ: vonguyen.localhost:3001 -> vonguyen)
-    const subdomain = hostname.split('.')[0];
-    
-    // Bỏ qua nếu không có subdomain hoặc là localhost
-    if (!subdomain || subdomain === 'localhost') {
-      return NextResponse.next();
+    // Xử lý cho môi trường development
+    if (domainParts.length > 1 && domainParts[0] !== 'localhost') {
+      isSubdomain = true;
+      subdomain = domainParts[0];
     }
-    
-    console.log(`Middleware detected hostname: ${hostname}, subdomain: ${subdomain}, path: ${path}`);
-    
-    // Xử lý API routes
-    if (path.startsWith('/api')) {
-      // Nếu là API route và không đã có subdomain trong path
-      if (!path.startsWith(`/api/${subdomain}`)) {
-        // Thêm subdomain vào API path
-        const newPath = path.replace('/api', `/api/${subdomain}`);
-        url.pathname = newPath;
-        
-        console.log(`Rewriting API to: ${url.pathname}`);
-        return NextResponse.rewrite(url);
-      }
-    } else {
-      // Xử lý các routes khác (không phải API)
-      const newPath = path === '/' ? `/${subdomain}` : `/${subdomain}${path}`;
-      url.pathname = newPath;
-      
-      console.log(`Rewriting to: ${url.pathname}`);
-      return NextResponse.rewrite(url);
+  } else if (hostname.includes(mainDomain)) {
+    // Xử lý cho môi trường production
+    // Ví dụ: gen8.lapnghiepvoi1trieudong.com -> ['gen8', 'lapnghiepvoi1trieudong', 'com']
+    if (domainParts.length > 2) {
+      isSubdomain = true;
+      subdomain = domainParts[0];
     }
   }
   
-  return NextResponse.next();
+  console.log(`Middleware: hostname=${hostname}, subdomain=${subdomain}, path=${path}, isSubdomain=${isSubdomain}`);
+  
+  // Thêm thông tin subdomain vào header
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set('x-subdomain', subdomain);
+  
+  // Trả về response với header chứa thông tin subdomain
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
 } 
