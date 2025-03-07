@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { streamText } from 'ai';
 import { createXai } from '@ai-sdk/xai';
 
+export const maxDuration = 60;
+export const runtime = 'edge';
+
 const xai = createXai({
   apiKey: process.env.XAI_API_KEY, // API key từ biến môi trường
   // Tùy chọn: nếu cần thay đổi URL mặc định hoặc thêm header
