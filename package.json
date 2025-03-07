@@ -11,15 +11,23 @@
   "dependencies": {
     "@ai-sdk/google": "^1.1.20",
     "@ai-sdk/react": "^1.1.21",
+    "@ai-sdk/xai": "^1.1.13",
     "@supabase/supabase-js": "^2.49.1",
     "ai": "^4.1.54",
     "framer-motion": "^12.4.10",
     "lucide-react": "^0.477.0",
     "next": "14.1.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-markdown": "^10.1.0",
+    "react-syntax-highlighter": "^15.6.1",
+    "rehype-raw": "^7.0.0",
+    "rehype-sanitize": "^6.0.0",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.16",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

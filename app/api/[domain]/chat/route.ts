@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { google } from '@ai-sdk/google';
 import { streamText } from 'ai';
+import { createXai } from '@ai-sdk/xai';
+
+const xai = createXai({
+  apiKey: process.env.XAI_API_KEY, // API key từ biến môi trường
+  // Tùy chọn: nếu cần thay đổi URL mặc định hoặc thêm header
+  // baseURL: 'https://api.x.ai/v1',
+  // headers: { 'Custom-Header': 'value' },
+});
 
 // Xử lý OPTIONS request cho CORS
 export async function OPTIONS() {
@@ -48,7 +55,7 @@ export async function POST(
     
     // Sử dụng Google Generative AI để tạo phản hồi
     const result = await streamText({
-      model: google('gemini-2.0-flash'),
+      model: xai('grok-2-latest'),
       messages: messagesWithSystem
     });
 

@@ -1,12 +1,15 @@
 "use client";
 
 import React, { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, m } from 'framer-motion';
 import { Send, Bot, User, Sparkles, MessageSquare, Brain } from 'lucide-react';
 import '../index.css';
 import useWindowSize from '../hooks/useWindowSize';
 import { useBrand } from './BrandContext';
 import { useChat } from '@ai-sdk/react';
+import { MarkdownComponents } from './MarkdownContent';
+import remarkGfm from 'remark-gfm';
+import ReactMarkdown from 'react-markdown';
 
 // Background bubble component
 const BackgroundBubble = ({ index }: { index: number }) => {
@@ -152,56 +155,53 @@ export default function ChatInterface() {
 
           {/* Messages container */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            <AnimatePresence mode="popLayout">
-              {messages.map((message) => (
-                <motion.div
-                  key={message.id}
-                  initial={{ opacity: 0, x: message.role === 'assistant' ? -20 : 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.2 }}
-                  className={`flex items-start gap-2 ${message.role === 'assistant' ? '' : 'flex-row-reverse'}`}
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex items-start gap-2 ${message.role === 'assistant' ? '' : 'flex-row-reverse'}`}
+              >
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  message.role === 'assistant' ? brandInfo.accentColor : brandInfo.secondaryColor
+                }`}>
+                  {message.role === 'assistant' ? <Bot size={20} className="text-white" /> : <User size={20} className="text-white" />}
+                </div>
+                <div
+                  className={`max-w-[80%] rounded-2xl px-4 py-2 ${
+                    message.role === 'assistant' 
+                      ? brandInfo.accentColor + ' text-white' 
+                      : brandInfo.secondaryColor + ' text-white'
+                  }`}
                 >
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    message.role === 'assistant' ? brandInfo.accentColor : brandInfo.secondaryColor
-                  }`}>
-                    {message.role === 'assistant' ? <Bot size={20} className="text-white" /> : <User size={20} className="text-white" />}
-                  </div>
-                  <motion.div
-                    layout
-                    className={`max-w-[80%] rounded-2xl px-4 py-2 ${
-                      message.role === 'assistant' 
-                        ? brandInfo.accentColor + ' text-white' 
-                        : brandInfo.secondaryColor + ' text-white'
-                    }`}
-                  >
-                    {message.content}
-                  </motion.div>
-                </motion.div>
-              ))}
-              
-              {/* Hiển thị trạng thái đang tải */}
-              {isLoading && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="flex items-start gap-2"
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={MarkdownComponents}>
+                      {message.content}
+                    </ReactMarkdown>
+                </div>
+              </div>
+            ))}
+            
+            {/* Giữ lại loading state */}
+            {isLoading && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex items-start gap-2"
+              >
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${brandInfo.accentColor}`}>
+                  <Bot size={20} className="text-white" />
+                </div>
+                <div
+                  className={`max-w-[80%] rounded-2xl px-4 py-2 ${brandInfo.accentColor} text-white`}
                 >
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${brandInfo.accentColor}`}>
-                    <Bot size={20} className="text-white" />
+                  <div className="flex space-x-2">
+                    <div className="w-2 h-2 rounded-full bg-white/60 animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                    <div className="w-2 h-2 rounded-full bg-white/60 animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                    <div className="w-2 h-2 rounded-full bg-white/60 animate-bounce" style={{ animationDelay: '300ms' }}></div>
                   </div>
-                  <motion.div
-                    className={`max-w-[80%] rounded-2xl px-4 py-2 ${brandInfo.accentColor} text-white`}
-                  >
-                    <div className="flex space-x-2">
-                      <div className="w-2 h-2 rounded-full bg-white/60 animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                      <div className="w-2 h-2 rounded-full bg-white/60 animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                      <div className="w-2 h-2 rounded-full bg-white/60 animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                    </div>
-                  </motion.div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                </div>
+              </motion.div>
+            )}
           </div>
 
           {/* Input area */}
