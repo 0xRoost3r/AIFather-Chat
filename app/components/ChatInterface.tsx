@@ -1,16 +1,12 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Bot, User, Sparkles, MessageSquare, Brain } from 'lucide-react';
 import '../index.css';
 import useWindowSize from '../hooks/useWindowSize';
 import { useBrand } from './BrandContext';
-
-interface Message {
-  text: string;
-  isBot: boolean;
-}
+import { useChat } from '@ai-sdk/react';
 
 // Background bubble component
 const BackgroundBubble = ({ index }: { index: number }) => {
@@ -43,15 +39,24 @@ const BackgroundBubble = ({ index }: { index: number }) => {
 };
 
 export default function ChatInterface() {
-  const [messages, setMessages] = useState<Message[]>([
-    { text: "Hello! How can I assist you today?", isBot: true }
-  ]);
-  const [input, setInput] = useState('');
   const [showIntro, setShowIntro] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  
   const { brandInfo, subdomain } = useBrand();
+
+  // Sử dụng useChat hook từ @ai-sdk/react
+  const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
+    api: `/api/${subdomain}/chat`,
+    initialMessages: [
+      {
+        id: 'welcome-message',
+        role: 'assistant',
+        content: "Hello! How can I assist you today?"
+      }
+    ],
+    onResponse: () => {
+      // Ẩn intro panel khi có tin nhắn đầu tiên
+      setShowIntro(false);
+    }
+  });
 
   console.log(`ChatInterface rendering for: ${subdomain} with brand:`, brandInfo);
 
@@ -61,61 +66,14 @@ export default function ChatInterface() {
     []
   );
 
-  const handleSend = async () => {
+  // Xử lý form submit
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (input.trim()) {
+      handleSubmit(e);
       setShowIntro(false);
-      setError(null); // Reset error state
-      
-      // Thêm tin nhắn của người dùng vào danh sách
-      const userMessage = input;
-      setMessages(prev => [...prev, { text: userMessage, isBot: false }]);
-      setInput('');
-      
-      // Hiển thị trạng thái đang tải
-      setIsLoading(true);
-      
-      try {
-        console.log(`Sending message to API from subdomain: ${subdomain}`);
-        
-        // Gọi API chat - sử dụng URL với subdomain
-        const response = await fetch(`/api/${subdomain}/chat`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            message: userMessage,
-          }),
-        });
-        
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          console.error('API error:', response.status, errorData);
-          throw new Error(`Server responded with status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log('API response:', data);
-        
-        // Thêm phản hồi từ bot vào danh sách tin nhắn
-        setMessages(prev => [...prev, { text: data.response, isBot: true }]);
-      } catch (error) {
-        console.error('Error sending message:', error);
-        setError(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
-        setMessages(prev => [...prev, { 
-          text: "Sorry, there was an error processing your request. Please try again later.", 
-          isBot: true 
-        }]);
-      } finally {
-        setIsLoading(false);
-      }
     }
   };
-
-  // Add this useEffect to log messages for debugging
-  useEffect(() => {
-    console.log("Current messages:", messages);
-  }, [messages]);
 
   return (
     <div className="h-screen bg-[#0a192f] flex items-center justify-center p-4 relative overflow-hidden">
@@ -192,32 +150,32 @@ export default function ChatInterface() {
             <h1 className="text-white text-xl font-bold">{brandInfo.chatTitle}</h1>
           </div>
 
-          {/* Messages container - Make sure this is visible and properly styled */}
+          {/* Messages container */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             <AnimatePresence mode="popLayout">
-              {messages.map((message, index) => (
+              {messages.map((message) => (
                 <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: message.isBot ? -20 : 20 }}
+                  key={message.id}
+                  initial={{ opacity: 0, x: message.role === 'assistant' ? -20 : 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.2 }}
-                  className={`flex items-start gap-2 ${message.isBot ? '' : 'flex-row-reverse'}`}
+                  className={`flex items-start gap-2 ${message.role === 'assistant' ? '' : 'flex-row-reverse'}`}
                 >
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    message.isBot ? brandInfo.accentColor : brandInfo.secondaryColor
+                    message.role === 'assistant' ? brandInfo.accentColor : brandInfo.secondaryColor
                   }`}>
-                    {message.isBot ? <Bot size={20} className="text-white" /> : <User size={20} className="text-white" />}
+                    {message.role === 'assistant' ? <Bot size={20} className="text-white" /> : <User size={20} className="text-white" />}
                   </div>
                   <motion.div
                     layout
                     className={`max-w-[80%] rounded-2xl px-4 py-2 ${
-                      message.isBot 
+                      message.role === 'assistant' 
                         ? brandInfo.accentColor + ' text-white' 
                         : brandInfo.secondaryColor + ' text-white'
                     }`}
                   >
-                    {message.text}
+                    {message.content}
                   </motion.div>
                 </motion.div>
               ))}
@@ -246,34 +204,33 @@ export default function ChatInterface() {
             </AnimatePresence>
           </div>
 
-          {/* Input area - Make sure this is visible and properly styled */}
+          {/* Input area */}
           <div className="p-4 border-t border-white/10 backdrop-blur-xl">
-            <div className="flex gap-2">
+            <form onSubmit={handleFormSubmit} className="flex gap-2">
               <input
-                type="text"
+                name="prompt"
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                onChange={handleInputChange}
                 placeholder="Type your message..."
                 className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white placeholder-white/50 focus:outline-none focus:border-pink-500"
               />
               <motion.button
+                type="submit"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={handleSend}
                 className={`bg-gradient-to-r ${brandInfo.primaryColor} text-white px-4 py-2 rounded-xl flex items-center gap-2`}
               >
                 <Send size={20} />
               </motion.button>
-            </div>
+            </form>
           </div>
         </motion.div>
       </div>
 
       {/* Hiển thị thông báo lỗi nếu có */}
       {error && (
-        <div className="bg-red-500/10 border border-red-500/50 rounded-md p-3 text-red-700 text-sm mb-4">
-          {error}
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-red-500/80 border border-red-500 rounded-md p-3 text-white text-sm">
+          {error.message || "An error occurred during the conversation."}
         </div>
       )}
     </div>

@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { google } from '@ai-sdk/google';
+import { streamText } from 'ai';
 
 // Xử lý OPTIONS request cho CORS
 export async function OPTIONS() {
@@ -16,42 +18,41 @@ export async function POST(
   { params }: { params: { domain: string } }
 ) {
   try {
-    // Log toàn bộ request để debug
-    console.log('API route params:', params);
-    console.log('API route headers:', Object.fromEntries(request.headers.entries()));
-    
     // Lấy subdomain từ params
     const subdomain = params.domain;
     
     console.log(`API route handling request for subdomain: ${subdomain}`);
     
     // Lấy dữ liệu từ request body
-    const body = await request.json();
-    console.log('Request body:', body);
+    const { messages } = await request.json();
     
-    const { message } = body;
-    
-    console.log(`Message received: "${message}"`);
-    
-    // Xử lý phản hồi dựa trên subdomain
-    let response: string;
+    // Tùy chỉnh prompt dựa trên subdomain
+    let systemPrompt = '';
     
     switch (subdomain) {
       case 'gen9':
-        response = `[Gen9] Phản hồi cho tin nhắn: "${message}"`;
+        systemPrompt = 'Bạn là Gen9 AI, một trợ lý thông minh với khả năng xử lý ngôn ngữ tự nhiên tiên tiến.';
         break;
       case 'gen8':
-        response = `[Gen8] Phản hồi cho tin nhắn: "${message}"`;
+        systemPrompt = 'Bạn là Gen8 AI, một trợ lý thông minh được phát triển để giúp đỡ người dùng.';
         break;
       default:
-        response = `[${subdomain}] Phản hồi cho tin nhắn: "${message}"`;
+        systemPrompt = `Bạn là ${subdomain} AI, một trợ lý thông minh được tùy chỉnh cho người dùng.`;
     }
     
-    return NextResponse.json({ 
-      response,
-      subdomain,
-      success: true 
+    // Thêm system message vào đầu nếu chưa có
+    const messagesWithSystem = [
+      { role: 'system', content: systemPrompt },
+      ...messages
+    ];
+    
+    // Sử dụng Google Generative AI để tạo phản hồi
+    const result = await streamText({
+      model: google('gemini-2.0-flash'),
+      messages: messagesWithSystem
     });
+
+    return result.toDataStreamResponse();
   } catch (error) {
     console.error('Detailed error in chat API:', error);
     // Log stack trace nếu có
