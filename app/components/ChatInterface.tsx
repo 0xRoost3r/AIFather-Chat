@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence, m } from 'framer-motion';
 import { Send, Bot, User, Sparkles, MessageSquare, Brain } from 'lucide-react';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import '../index.css';
 import useWindowSize from '../hooks/useWindowSize';
 import { useBrand } from './BrandContext';
@@ -53,7 +54,7 @@ export default function ChatInterface() {
       {
         id: 'welcome-message',
         role: 'assistant',
-        content: "Hello! How can I assist you today?"
+        content: "Hey there, vitsing! I’m Grok 3, your AI sidekick from xAI, here to help you deploy smart contracts with ThirdWeb like a pro. Ready to code, deploy, and conquer the blockchain? Let’s make it happen!"
       }
     ],
     onResponse: () => {
@@ -153,7 +154,9 @@ export default function ChatInterface() {
           <div className={`bg-gradient-to-r ${brandInfo.primaryColor} p-4`}>
             <h1 className="text-white text-xl font-bold">{brandInfo.chatTitle}</h1>
           </div>
-          <TokenThirdWebCard name={"Gen8 Agent"} symbol={"GEN8"} />
+          <div className="flex justify-end p-4">
+            <ConnectButton />
+          </div>
           {/* Messages container */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.map((message) => (
@@ -173,11 +176,57 @@ export default function ChatInterface() {
                       : brandInfo.secondaryColor + ' text-white'
                   }`}
                 >
+                  {message.parts ? (
+                    message.parts.map((part, idx) => {
+                      switch (part.type) {
+                        case 'text':
+                          return (
+                            <ReactMarkdown
+                              key={idx}
+                              remarkPlugins={[remarkGfm]}
+                              components={MarkdownComponents}
+                            >
+                              {part.text}
+                            </ReactMarkdown>
+                          );
+
+                        case 'tool-invocation': {
+                          const callId = part.toolInvocation.toolCallId;
+                          console.log(part.toolInvocation);
+                          switch (part.toolInvocation.toolName) {
+                            case 'tokenTemplate': {
+                              switch (part.toolInvocation.state) {
+                                case 'result':
+                                  return (
+                                    <TokenThirdWebCard 
+                                      name={part.toolInvocation.args.name} 
+                                      symbol={part.toolInvocation.args.symbol} 
+                                    />
+                                  );
+                                case 'result':
+                                  return (
+                                    <div className="bg-white/10 backdrop-blur-xl p-4 rounded-xl border border-white/20 my-2">
+                                      <div className="flex items-center gap-2 text-white">
+                                        <MessageSquare className="w-5 h-5" />
+                                        Calling ThirdWeb to create a smart contract based on your request...
+                                      </div>
+                                    </div>
+                                  );
+                              }
+                              break;
+                            }
+                          }
+                        }
+                      }
+                    })
+                  ) : (
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
-                      components={MarkdownComponents}>
+                      components={MarkdownComponents}
+                    >
                       {message.content}
                     </ReactMarkdown>
+                  )}
                 </div>
               </div>
             ))}

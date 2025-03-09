@@ -121,16 +121,16 @@ export function TokenThirdWebCard({ name, symbol }: TokenProps) {
   console.log(`isDeploying`, isDeploying)
 
   return (
-    <div className="min-w-full mx-auto rounded-xl shadow-lg overflow-hidden bg-white border-2 border-blue-500">
+    <div className="min-w-full mx-auto rounded-xl shadow-lg overflow-hidden bg-black/40 backdrop-blur-xl border border-pink-500/20">
       <div className="px-6 py-6">
         <div className="flex items-center justify-between gap-8 pb-2">
           <div className="flex items-center gap-3">
-            <div className='text-xs sm:text-sm font-semibold text-gray-800'>
+            <div className='text-xs sm:text-sm font-semibold text-white/90'>
               <h2>Name: {name}</h2>
               <p>Symbol: {symbol}</p>
             </div>
           </div>
-          <div className="text-xs sm:text-sm font-semibold text-gray-800">
+          <div className="text-xs sm:text-sm font-semibold text-white/90">
             <h2>Total Supply: Mintable</h2>
             <h2>Decimals: 18</h2>
           </div>
@@ -144,12 +144,13 @@ export function TokenThirdWebCard({ name, symbol }: TokenProps) {
                 onClick={handleDeploy}
                 disabled={isDeploying || insufficientBalance || isPending}
                 className={`
-                  bg-gradient-to-r from-blue-600 to-pink-500
+                  bg-gradient-to-r from-pink-600 to-purple-500
                   text-white px-4 py-2 rounded-xl
                   flex items-center gap-2
                   disabled:opacity-50 disabled:cursor-not-allowed
                   transition-all duration-200 ease-in-out
                   hover:scale-[1.02] active:scale-[0.98]
+                  border border-pink-500/20
                 `}
               >
                 {isDeploying ? (
@@ -167,9 +168,9 @@ export function TokenThirdWebCard({ name, symbol }: TokenProps) {
           </div>  
           
           {address && (
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-white/60">
               Estimated cost: {deployFee} {chain?.nativeCurrency.symbol} 
-              <span className="ml-1 text-gray-400">
+              <span className="ml-1 text-white/40">
                 (Gas fee not included)
               </span>
             </p>
@@ -178,16 +179,16 @@ export function TokenThirdWebCard({ name, symbol }: TokenProps) {
         }
 
         {transactionHash && (
-          <div className="mt-4 pt-4 border-t">
-            <h3 className="font-semibold text-black mb-2 text-base sm:text-base">Smart Contract Details</h3>
-            <div className="space-y-2 text-xs sm:text-sm text-gray-600">
+          <div className="mt-4 pt-4 border-t border-pink-500/20">
+            <h3 className="font-semibold text-white/90 mb-2 text-base sm:text-base">Smart Contract Details</h3>
+            <div className="space-y-2 text-xs sm:text-sm text-white/70">
               <div className="flex items-center justify-between">
                 <span>Transaction Hash:</span>
                 <a 
                   href={`${explorer?.url}/tx/${transactionHash}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline truncate max-w-[200px]"
+                  className="text-pink-400 hover:text-pink-300 truncate max-w-[200px]"
                 >
                   {shortenAddress(transactionHash)}
                 </a>
@@ -199,7 +200,7 @@ export function TokenThirdWebCard({ name, symbol }: TokenProps) {
                     href={`${explorer?.url}/address/${contractAddress}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline truncate max-w-[140px] sm:max-w-[160px]"
+                    className="text-pink-400 hover:text-pink-300 truncate max-w-[140px] sm:max-w-[160px]"
                   >
                     {transactionHash && !contractAddress ? (
                       <span className="flex items-center gap-2">
@@ -213,13 +214,13 @@ export function TokenThirdWebCard({ name, symbol }: TokenProps) {
                   {contractAddress && (
                     <button
                       onClick={() => handleCopy(contractAddress || '')}
-                      className="p-1 hover:bg-gray-100 rounded-md"
+                      className="p-1 hover:bg-white/5 rounded-md"
                       title="Copy address"
                     >
                       {copied ? (
-                        <Check className="h-4 w-4 text-green-500" />
+                        <Check className="h-4 w-4 text-green-400" />
                       ) : (
-                        <Copy className="h-4 w-4 text-gray-500" />
+                        <Copy className="h-4 w-4 text-white/60" />
                       )}
                     </button>
                   )}
@@ -235,10 +236,15 @@ export function TokenThirdWebCard({ name, symbol }: TokenProps) {
               </div>
               <div className="space-y-2 sm:space-y-0">
                 <div className="flex items-center">
-                  <span className="text-gray-600">Suggestion:</span>
+                  <span className="text-white/70">Suggestion:</span>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
-                  <button onClick={() => handleSuggestion(`https://thirdweb.com/${chainId}/${contractAddress}`)} className="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 justify-center transition-colors">
+                  <button 
+                    onClick={() => handleSuggestion(`https://thirdweb.com/${chainId}/${contractAddress}`)} 
+                    className="w-full sm:w-auto bg-gradient-to-r from-pink-600 to-purple-500 hover:from-pink-500 hover:to-purple-400 
+                    text-white text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 justify-center transition-all
+                    border border-pink-500/20"
+                  >
                     <Settings2 className="h-4 w-4" />
                     Manage token via ThirdWeb
                   </button>
@@ -258,7 +264,7 @@ interface TokenLoadingProps {
 
 export function TokenLoading({ name }: TokenLoadingProps) {
   return (
-    <div className="min-w-full mx-auto bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg overflow-hidden p-8">
+    <div className="min-w-full mx-auto bg-gradient-to-r from-pink-600 to-purple-500 rounded-xl shadow-lg overflow-hidden p-8 border border-pink-500/20 backdrop-blur-xl">
       <h2 className="text-4xl font-bold text-white text-center">{name}</h2>
       <div className="flex justify-center items-center h-40">
         <Loader2 className="h-8 w-8 animate-spin text-white" />

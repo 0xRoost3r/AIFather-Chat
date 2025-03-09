@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { streamText } from 'ai';
+import { streamText, tool } from 'ai';
 import { createXai } from '@ai-sdk/xai';
-
+import { z } from 'zod';
 export const maxDuration = 60;
 export const runtime = 'edge';
 
@@ -41,14 +41,21 @@ export async function POST(
     
     switch (subdomain) {
       case 'gen9':
-        systemPrompt = 'Bạn là Gen9 AI, một trợ lý thông minh với khả năng xử lý ngôn ngữ tự nhiên tiên tiến.';
+        systemPrompt = 'You are Gen9 AI, .';
         break;
       case 'gen8':
-        systemPrompt = 'Bạn là Gen8 AI, một trợ lý thông minh được phát triển để giúp đỡ người dùng.';
+        systemPrompt = 'You are Gen8 AI, .';
         break;
       default:
-        systemPrompt = `Bạn là ${subdomain} AI, một trợ lý thông minh được tùy chỉnh cho người dùng.`;
+        systemPrompt = `You are ${subdomain} AI, .`;
     }
+
+    systemPrompt += `
+You are an expert in web3. Your task is to provide comprehensive advice and guidance for generating a ERC20 token in ThirdWeb. Follow these rules:
+1. For tokens (ERC-20):
+  - If the 'symbol' is missing, use the 'name' as the symbol.
+  - Provide a detailed template including 'name', 'symbol'.
+    `
     
     // Thêm system message vào đầu nếu chưa có
     const messagesWithSystem = [
@@ -59,7 +66,21 @@ export async function POST(
     // Sử dụng Google Generative AI để tạo phản hồi
     const result = await streamText({
       model: xai('grok-2-latest'),
-      messages: messagesWithSystem
+      messages: messagesWithSystem,
+      tools: {
+        tokenTemplate: tool({
+          description: 'Get a template for ERC20 token',
+          parameters: z.object({
+            name: z.string().describe('The name of the token'),
+            symbol: z.string().describe('The symbol of the token'),
+          }),
+          execute: async ({ name, symbol }) => {
+            return {
+              name,
+              symbol,
+            };
+          },
+        })}
     });
 
     return result.toDataStreamResponse();
