@@ -101,6 +101,9 @@ importers:
       wagmi:
         specifier: ^2.14.12
         version: 2.14.12(@tanstack/query-core@5.67.2)(@tanstack/react-query@5.67.2(react@18.3.1))(@types/react@18.3.18)(bufferutil@4.0.9)(react@18.3.1)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.23.8(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2)
+      zod:
+        specifier: ^3.24.2
+        version: 3.24.2
     devDependencies:
       '@tailwindcss/typography':
         specifier: ^0.5.16
