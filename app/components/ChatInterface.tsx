@@ -10,6 +10,7 @@ import { useChat } from '@ai-sdk/react';
 import { MarkdownComponents } from './MarkdownContent';
 import remarkGfm from 'remark-gfm';
 import ReactMarkdown from 'react-markdown';
+import { TokenThirdWebCard } from './tokenThirdWebCard';
 
 // Background bubble component
 const BackgroundBubble = ({ index }: { index: number }) => {
@@ -152,7 +153,7 @@ export default function ChatInterface() {
           <div className={`bg-gradient-to-r ${brandInfo.primaryColor} p-4`}>
             <h1 className="text-white text-xl font-bold">{brandInfo.chatTitle}</h1>
           </div>
-
+          <TokenThirdWebCard name={"Gen8 Agent"} symbol={"GEN8"} />
           {/* Messages container */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.map((message) => (

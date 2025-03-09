@@ -1,36 +1,141 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Gen8 AI - Dynamic Subdomain Chat Application
+
+A modern AI chat application built with Next.js 14, supporting dynamic subdomains and real-time streaming responses using Google's Generative AI.
+
+## Features
+
+- 🌐 Dynamic subdomain support (e.g., gen8.domain.com, gen9.domain.com)
+- 🤖 Integration with Google Generative AI
+- 💬 Real-time streaming text responses
+- 🎨 Beautiful UI with Tailwind CSS and Framer Motion
+- 🌙 Dark mode optimized
+- 📱 Fully responsive design
+- 🔒 Token-based access control
+- ✨ Markdown support with syntax highlighting
+- 🔄 Smooth animations and transitions
+
+## Tech Stack
+
+- **Framework:** Next.js 14 (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **UI Components:** 
+  - Framer Motion for animations
+  - Lucide Icons
+  - React Markdown for content rendering
+- **AI Integration:** Google Generative AI
+- **Development:** 
+  - ESLint
+  - Prettier
+  - TypeScript strict mode
 
 ## Getting Started
 
-First, run the development server:
-
+1. **Clone the repository**
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/yourusername/gen8-ai.git
+cd gen8-ai
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Install dependencies**
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **Set up environment variables**
+Create a `.env.local` file in the root directory:
+```env
+GOOGLE_GENERATIVE_AI_API_KEY=your_api_key_here
+```
 
+4. **Run the development server**
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) to view the application.
+
+## Project Structure
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+gen8-ai/
+├── app/
+│ ├── api/
+│ │ └── [domain]/
+│ │ └── chat/
+│ │ └── route.ts
+│ ├── components/
+│ │ ├── BrandContext.tsx
+│ │ ├── ChatInterface.tsx
+│ │ ├── MarkdownContent.tsx
+│ │ └── TokenCard.tsx
+│ ├── hooks/
+│ │ └── useWindowSize.ts
+│ ├── layout.tsx
+│ └── page.tsx
+├── middleware.ts
+└── public/
+```
 
-## Learn More
+## Key Components
 
-To learn more about Next.js, take a look at the following resources:
+- **ChatInterface:** Main chat UI component with streaming text support
+- **MarkdownContent:** Renders markdown content with syntax highlighting
+- **TokenCard:** Displays user token information and usage
+- **BrandContext:** Manages brand-specific theming per subdomain
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## API Routes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **POST /api/[domain]/chat**
+  - Handles chat requests for specific subdomains
+  - Supports streaming responses
+  - Integrates with Google Generative AI
 
-## Deploy on Vercel
+## Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This application is optimized for deployment on Vercel:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Push your code to GitHub
+2. Import your repository on Vercel
+3. Set up environment variables
+4. Configure custom domains and subdomains
+
+### Subdomain Setup
+
+1. Add your domain to Vercel
+2. Configure wildcard DNS records:
+.yourdomain.com CNAME vercel.app
+
+## Environment Variables
+
+Required environment variables:
+- `GOOGLE_GENERATIVE_AI_API_KEY`: Your Google AI API key
+
+## Development Guidelines
+
+1. **Styling:**
+   - Use Tailwind classes for styling
+   - Follow the established color scheme from BrandContext
+   - Maintain responsive design principles
+
+2. **Components:**
+   - Keep components modular and reusable
+   - Use TypeScript interfaces for props
+   - Implement proper error handling
+
+3. **API Routes:**
+   - Include proper error handling
+   - Use TypeScript for type safety
+   - Implement rate limiting where necessary
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a new Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
