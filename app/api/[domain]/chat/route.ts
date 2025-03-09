@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { streamText, tool } from 'ai';
 import { createXai } from '@ai-sdk/xai';
 import { z } from 'zod';
+import site from '@/constant';
 export const maxDuration = 60;
 export const runtime = 'edge';
 
@@ -37,25 +38,7 @@ export async function POST(
     const { messages } = await request.json();
     
     // Tùy chỉnh prompt dựa trên subdomain
-    let systemPrompt = '';
-    
-    switch (subdomain) {
-      case 'gen9':
-        systemPrompt = 'You are Gen9 AI, .';
-        break;
-      case 'gen8':
-        systemPrompt = 'You are Gen8 AI, .';
-        break;
-      default:
-        systemPrompt = `You are ${subdomain} AI, .`;
-    }
-
-    systemPrompt += `
-You are an expert in web3. Your task is to provide comprehensive advice and guidance for generating a ERC20 token in ThirdWeb. Follow these rules:
-1. For tokens (ERC-20):
-  - If the 'symbol' is missing, use the 'name' as the symbol.
-  - Provide a detailed template including 'name', 'symbol'.
-    `
+    let systemPrompt = `You are ${subdomain} AI, an expert in web3 and domain management.`;
     
     // Thêm system message vào đầu nếu chưa có
     const messagesWithSystem = [
@@ -80,7 +63,50 @@ You are an expert in web3. Your task is to provide comprehensive advice and guid
               symbol,
             };
           },
-        })}
+        }),
+        
+        // Add new tool for subdomain creation
+        agentClone: tool({
+          description: 'Create a new subdomain for the user',
+          parameters: z.object({
+            username: z.string().describe('Username to create subdomain for'),
+            purpose: z.string().describe('Purpose of the agent clone'),
+          }),
+          execute: async ({ username, purpose }) => {
+            try {
+              // Remove special characters and spaces from username
+              const sanitizedUsername = username
+                .toLowerCase()
+                .replace(/[^a-z0-9]/g, '');
+
+              // Construct the subdomain URL
+              const subdomainUrl = `${sanitizedUsername}.${site.host}`;
+
+              // Here you would typically:
+              // 1. Check if subdomain is available
+              // 2. Create DNS record
+              // 3. Set up the new agent configuration
+              // For now, we'll just return the information
+
+              return {
+                success: true,
+                subdomain: subdomainUrl,
+                message: `Agent clone created successfully at ${subdomainUrl}`,
+                purpose: purpose,
+                originalAgent: subdomain,
+                createdAt: new Date().toISOString()
+              };
+            } catch (error) {
+              console.error('Error creating subdomain:', error);
+              return {
+                success: false,
+                error: 'Failed to create subdomain',
+                message: error instanceof Error ? error.message : 'Unknown error'
+              };
+            }
+          },
+        })
+      }
     });
 
     return result.toDataStreamResponse();

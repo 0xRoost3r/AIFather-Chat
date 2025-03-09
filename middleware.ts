@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import site from './constant';
 
 export const config = {
   matcher: [
@@ -13,7 +14,7 @@ export default async function middleware(req: NextRequest) {
   const path = url.pathname;
   
   // Xác định domain chính
-  const mainDomain = 'lapnghiepvoi1trieudong.com';
+  const mainDomain = site.host;
   
   // Lấy các phần của domain
   const domainParts = hostname.split('.');

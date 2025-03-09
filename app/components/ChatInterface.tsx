@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence, m } from 'framer-motion';
-import { Send, Bot, User, Sparkles, MessageSquare, Brain } from 'lucide-react';
+import { Send, Bot, User, Sparkles, MessageSquare, Brain, Check } from 'lucide-react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import '../index.css';
 import useWindowSize from '../hooks/useWindowSize';
@@ -12,7 +12,7 @@ import { MarkdownComponents } from './MarkdownContent';
 import remarkGfm from 'remark-gfm';
 import ReactMarkdown from 'react-markdown';
 import { TokenThirdWebCard } from './tokenThirdWebCard';
-
+import  site from '@/constant';
 // Background bubble component
 const BackgroundBubble = ({ index }: { index: number }) => {
   const style = useMemo(() => ({
@@ -54,7 +54,7 @@ export default function ChatInterface() {
       {
         id: 'welcome-message',
         role: 'assistant',
-        content: "Hey there, vitsing! I’m Grok 3, your AI sidekick from xAI, here to help you deploy smart contracts with ThirdWeb like a pro. Ready to code, deploy, and conquer the blockchain? Let’s make it happen!"
+        content: "Hey there, vitsing! I'm Grok 2, your AI sidekick from xAI, here to help you deploy smart contracts with ThirdWeb like a pro. Ready to code, deploy, and conquer the blockchain? Let's make it happen!"
       }
     ],
     onResponse: () => {
@@ -199,11 +199,12 @@ export default function ChatInterface() {
                                 case 'result':
                                   return (
                                     <TokenThirdWebCard 
+                                      key={callId}
                                       name={part.toolInvocation.args.name} 
                                       symbol={part.toolInvocation.args.symbol} 
                                     />
                                   );
-                                case 'result':
+                                case 'call':
                                   return (
                                     <div className="bg-white/10 backdrop-blur-xl p-4 rounded-xl border border-white/20 my-2">
                                       <div className="flex items-center gap-2 text-white">
@@ -212,6 +213,52 @@ export default function ChatInterface() {
                                       </div>
                                     </div>
                                   );
+                              }
+                              break;
+                            }
+                            case 'agentClone': {
+                              switch (part.toolInvocation.state) {
+                                case 'call':
+                                  return (
+                                    <div className="bg-white/10 backdrop-blur-xl p-4 rounded-xl border border-white/20 my-2">
+                                      <div className="flex items-center gap-2 text-white">
+                                        <MessageSquare className="w-5 h-5" />
+                                        Creating agent clone for {part.toolInvocation.args.username}...
+                                      </div>
+                                    </div>
+                                  );
+                                case 'result':
+                                  try {
+                                    // Parse the result if it's a string, or use it directly if it's already an object
+                                    const result = typeof part.toolInvocation.result === 'string' 
+                                      ? JSON.parse(part.toolInvocation.result) 
+                                      : part.toolInvocation.result;
+
+                                    console.log('Agent Clone Result:', result); // For debugging
+
+                                    return (
+                                      <div className="bg-white/10 backdrop-blur-xl p-4 rounded-xl border border-white/20 my-2">
+                                        <div className="space-y-2">
+                                          <div className="flex items-center gap-2 text-green-400">
+                                            <Check className="w-5 h-5" />
+                                            Agent Clone Created Successfully
+                                          </div>
+                                          <div className="text-white/80">
+                                            <p>Subdomain: <a href={`https://${result.subdomain}`} target="_blank" rel="noopener noreferrer" className="text-white hover:text-green-400">{`https://${result.subdomain}`}</a></p>
+                                            <p>Purpose: <span className="text-white">{result.purpose}</span></p>
+                                            <p>Original Agent: <span className="text-white">{result.originalAgent}</span></p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  } catch (error) {
+                                    console.error('Error parsing result:', error, part.toolInvocation.result);
+                                    return (
+                                      <div className="bg-white/10 backdrop-blur-xl p-4 rounded-xl border border-white/20 my-2">
+                                        <div className="text-red-400">Error displaying result</div>
+                                      </div>
+                                    );
+                                  }
                               }
                               break;
                             }

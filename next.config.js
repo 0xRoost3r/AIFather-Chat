@@ -5,7 +5,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['localhost', 'lapnghiepvoi1trieudong.com'],
+    domains: ['localhost', "aifather.chat"],
   },
   async headers() {
     return [
@@ -30,7 +30,7 @@ const nextConfig = {
           has: [
             {
               type: 'host',
-              value: '(?<subdomain>[^.]+).lapnghiepvoi1trieudong.com',
+              value: '(?<subdomain>[^.]+).aifather.chat',
             },
           ],
           destination: '/:path*',
