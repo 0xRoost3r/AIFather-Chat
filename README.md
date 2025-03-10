@@ -89,7 +89,7 @@ gen8-ai/
 - **POST /api/[domain]/chat**
   - Handles chat requests for specific subdomains
   - Supports streaming responses
-  - Integrates with Google Generative AI
+  - Integrates with X.AI GROK 2
 
 ## Deployment
 
