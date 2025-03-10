@@ -1,4 +1,4 @@
-# Gen8 AI - Dynamic Subdomain Chat Application
+# AIFather AI - The Godfather of Onchain ChatBots
 
 A modern AI chat application built with Next.js 14, supporting dynamic subdomains and real-time streaming responses using X Grok 2's Generative AI.
 
