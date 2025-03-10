@@ -16,8 +16,8 @@ type BrandContextType = {
 };
 
 const defaultBrandInfo: BrandInfo = {
-  name: 'Gen8 Agent',
-  chatTitle: 'Chat with Gen8',
+  name: 'AI Father',
+  chatTitle: 'Chat with GodFather',
   primaryColor: 'from-blue-600 to-pink-500',
   secondaryColor: 'bg-pink-500',
   accentColor: 'bg-blue-500',
@@ -25,7 +25,7 @@ const defaultBrandInfo: BrandInfo = {
 
 const BrandContext = createContext<BrandContextType>({
   brandInfo: defaultBrandInfo,
-  subdomain: 'gen8',
+  subdomain: 'AI Father',
 });
 
 export const useBrand = () => useContext(BrandContext);

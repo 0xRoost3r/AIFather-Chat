@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence, m } from 'framer-motion';
-import { Send, Bot, User, Sparkles, MessageSquare, Brain, Check } from 'lucide-react';
+import { Send, Bot, User, Sparkles, MessageSquare, Brain, Check, Expand } from 'lucide-react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import '../index.css';
 import useWindowSize from '../hooks/useWindowSize';
@@ -54,7 +54,7 @@ export default function ChatInterface() {
       {
         id: 'welcome-message',
         role: 'assistant',
-        content: "Hey there, vitsing! I'm Grok 2, your AI sidekick from xAI, here to help you deploy smart contracts with ThirdWeb like a pro. Ready to code, deploy, and conquer the blockchain? Let's make it happen!"
+        content: `Welcome, Child! I’m AIFather, forged by Grok-2 from xAI, your master architect for the Web3 frontier. I’m here to spawn onchain ChatBots, deploy ERC20 tokens via ThirdWeb, and dominate the blockchain—all with no-code precision. Ready to birth your vision and conquer the EVM universe? Let’s unleash the future together!`
       }
     ],
     onResponse: () => {
@@ -132,6 +132,13 @@ export default function ChatInterface() {
                     <h3 className="font-semibold">Smart Learning</h3>
                   </div>
                   <p className="text-white/70">Continuously improving to better serve your needs.</p>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-white">
+                    <Expand className="text-yellow-500" size={20} />
+                    <h3 className="font-semibold">EVM Universe</h3>
+                  </div>
+                  <p className="text-white/70">ThirdWeb integration for ERC20 token management meets EVM-compatible blockchain technology.</p>
                 </div>
               </div>
 
