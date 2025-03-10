@@ -1,6 +1,6 @@
 # Gen8 AI - Dynamic Subdomain Chat Application
 
-A modern AI chat application built with Next.js 14, supporting dynamic subdomains and real-time streaming responses using Google's Generative AI.
+A modern AI chat application built with Next.js 14, supporting dynamic subdomains and real-time streaming responses using X Grok 2's Generative AI.
 
 ## Features
 
@@ -33,19 +33,19 @@ A modern AI chat application built with Next.js 14, supporting dynamic subdomain
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/yourusername/gen8-ai.git
-cd gen8-ai
+git clone https://github.com/0xRoost3r/AIFather-Chat.git
+cd AIFather-Chat
 ```
 
 2. **Install dependencies**
 ```bash
-npm install
+pnpm install
 ```
 
 3. **Set up environment variables**
 Create a `.env.local` file in the root directory:
 ```env
-GOOGLE_GENERATIVE_AI_API_KEY=your_api_key_here
+XAI_API_KEY=your_api_key_here
 ```
 
 4. **Run the development server**
@@ -109,7 +109,7 @@ This application is optimized for deployment on Vercel:
 ## Environment Variables
 
 Required environment variables:
-- `GOOGLE_GENERATIVE_AI_API_KEY`: Your Google AI API key
+- `XAI_API_KEY`: Your GROK API key
 
 ## Development Guidelines
 
